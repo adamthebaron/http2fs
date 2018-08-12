@@ -1,0 +1,237 @@
+#define MaxBuf			64 * 1024
+#define MaxHeaders		64
+#define MaxHeaderSize	2048
+
+extern const char Upgradereq[];
+extern const char Upgradeh2c[];
+
+static u8int CRLF[2] = {
+	0x0d, 0x0a,
+};
+
+static u8int GET[3] = {
+	0x47, 0x45, 0x54,
+};
+
+static u8int Http2ConnPrefix[24] = {
+	0x50, 0x52, 0x49, 0x20, 0x2a, 0x20, 0x48,
+	0x54, 0x54, 0x50, 0x2f, 0x32, 0x2e, 0x30,
+	0x0d, 0x0a, 0x0d, 0x0a, 0x53, 0x4d, 0x0d,
+	0x0a, 0x0d, 0x0a,
+};
+
+static u8int RawHttp2SettingsFrame[9] = {
+	0x00, 0x00, 0x24, 0x04, 0x00, 0x00, 0x00, 0x00,
+	0x00,
+};
+
+static u8int AckSettingsFrame[9] = {
+	0x00, 0x00, 0x00, 0x04, 0x01, 0x00, 0x00, 0x00, 0x00,
+};
+
+static u8int RawHttp2Settings[45] = {
+	0x00, 0x00, 0x24, 0x04, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x80,
+	0x00, 0x02, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x03, 0x00, 0x00, 0x00, 0x20,
+	0x00, 0x04, 0x00, 0x00, 0xFF, 0xFF,
+	0x00, 0x05, 0x00, 0x00, 0x40, 0x00,
+	0x00, 0x06, 0x00, 0x00, 0x00, 0x40,
+};
+
+typedef struct HMethod HMethod;
+typedef struct HHeader HHeader;
+typedef struct HStream HStream;
+typedef struct HReq HReq;
+typedef struct HResp HResp;
+typedef struct HConn HConn;
+typedef struct HSettings HSettings;
+typedef struct TData TData;
+struct TData {
+	int acfd, anfd, lnfd, pid;
+	char adir[64], ldir[64];
+};
+
+enum statuscodes {
+	HContinue,
+	HSwitchProto,
+	HOk,
+	HCreated,
+	HAccepted,
+	HNonAuthInfo,
+	HNoContent,
+	HResetContent,
+	HPartialContent,
+	HMultiChoice,
+	HMovedPerm,
+	HFound,
+	HSeeOther,
+	HNotModified,
+	HUseProxy,
+	HTribe,
+	HTempRedir,
+	HBadReq,
+	HUnauth,
+	HPayRequired,
+	HForbidden,
+	HNotFound,
+	HMethNotAllowed,
+	HNotAcceptable,
+	HProxyAuthRequired,
+	HReqTimeout,
+	HConflict,
+	HGone,
+	HLengthRequired,
+	HPrecondFailed,
+	HReqEntityTooLarge,
+	HReqURITooLong,
+	HUnsupportedMediaType,
+	HReqRangeNotSatisfiable,
+	HExpectationFailed,
+	HInternalServerError,
+	HNotImplemented,
+	HBadGateway,
+	HServUnavailable,
+	HGatewayTimeout,
+	HVerNotSupported
+};
+
+static char* HStatuscodes[] = {
+	[HContinue]					"100 Continue",
+	[HSwitchProto]				"101 Switching Protocols",
+	[HOk]						"200 OK",
+	[HCreated]					"201 Created",
+	[HAccepted]					"202 Accepted",
+	[HNonAuthInfo]				"203 Non-Authoritative Information",
+	[HNoContent]				"204 No Content",
+	[HResetContent]				"205 Reset Content",
+	[HPartialContent]			"206 Partial Content",
+	[HMultiChoice]				"300 Multiple Choices",
+	[HMovedPerm]				"301 Moved Permanently",
+	[HFound]					"302 Found",
+	[HSeeOther]					"303 See Other",
+	[HNotModified]				"304 Not Modified",
+	[HUseProxy]					"305 Use Proxy",
+	[HTribe]					"306 Tell Your Mother Tell Your Father Send A Telegram",
+	[HTempRedir]				"307 Temporary Redirect",
+	[HBadReq]					"400 Bad Request",
+	[HUnauth]					"401 Unauthorized",
+	[HPayRequired]				"402 Payment Required",
+	[HForbidden]				"403 Forbidden",
+	[HNotFound]					"404 Not Found",
+	[HMethNotAllowed]			"405 Method Not Allowed",
+	[HNotAcceptable]			"406 Not Acceptable",
+	[HProxyAuthRequired]		"407 Proxy Authentication Required",
+	[HReqTimeout]				"408 Request Timeout",
+	[HConflict]					"409 Conflict",
+	[HGone]						"410 Gone",
+	[HLengthRequired]			"411 Length Required",
+	[HPrecondFailed]			"412 Precondition Failed",
+	[HReqEntityTooLarge]		"413 Request Entity Too Large",
+	[HReqURITooLong]			"414 Request-URI Too Long",
+	[HUnsupportedMediaType]		"415 Unsupported Media Type",
+	[HReqRangeNotSatisfiable]	"416 Requested Range Not Satisfiable",
+	[HExpectationFailed]		"417 Expectation Failed",
+	[HInternalServerError]		"500 Internal Server Error",
+	[HNotImplemented]			"501 Not Implemented",
+	[HBadGateway]				"502 Bad Gateway",
+	[HServUnavailable]			"503 Service Unavailable",
+	[HGatewayTimeout]			"504 Gateway Timeout",
+	[HVerNotSupported]			"505 HTTP Version Not Supported",
+};
+
+/* frame definitions */
+enum frames {
+	/* 0000 */ Data =			0x0,
+	/* 0001 */ Headers =		0x1,
+	/* 0010 */ Priority =		0x2,
+	/* 0011 */ RstStream =		0x3,
+	/* 0100 */ Settings =		0x4,
+	/* 0101 */ PushPromise =	0x5,
+	/* 1000 */ Ping =			0x6,
+	/* 1001 */ Goaway =			0x7,
+	/* 1010 */ WindowUpdate =	0x8
+};
+
+/* SETTINGS frame parameters */
+enum http2settings {
+	/* 0001 */ HeaderTableSize =		0x1,
+	/* 0010 */ EnablePush =				0x2,
+	/* 0011 */ MaxConcurrentStreams =	0x3,
+	/* 0100 */ InitialWindowSize =		0x4,
+	/* 0101 */ MaxFrameSize =			0x5,
+	/* 1000 */ MaxHeaderListSize =		0x6,
+};
+
+/* method data structure */
+struct HMethod {
+	uchar method[8];	/* "verb" of method */
+	uchar url[256];		/* location of document requested */
+	uchar version[8];	/* http version */
+};
+
+/* header data structure */
+struct HHeader {
+	uchar name[64]; /* name of header (Content-Type, Upgrade, etc) */
+	uchar val[256]; /* value of respective header */
+};
+
+/* http request data structure */
+struct HReq {
+	u32int len;
+	u32int curpos;
+	u8int buf[MaxBuf];
+};
+
+/* http response data structure */
+struct HResp {
+	u32int len;
+	u32int curpos;
+	u8int buf[MaxBuf];
+};
+
+struct HStream {
+	u32int id;
+	HResp *resp;
+	HReq *req;
+	HStream *parent;
+	HStream *child[32];
+};
+
+/* connection state */
+struct HConn {
+	HReq rreq;
+	HResp rresp;
+	HStream *stream[256];
+	//NetConnInfo *conninfo;	/* network info about connection */
+};
+
+/* SETTINGS frame */
+struct HSettings {
+	u16int id[6];
+	u32int val[6];
+};
+
+/* default HTTP/2 settings */
+static HSettings defaultsettings[6] = {
+	{HeaderTableSize,		128},
+	{EnablePush,			0},
+	{MaxConcurrentStreams,	32},
+	{InitialWindowSize,		65535},
+	{MaxFrameSize,			16384},
+	{MaxHeaderListSize,		64},
+};
+
+char* getword(char*);
+void main(int, char*[]);
+void createreq(HReq*, uchar*);
+void handleh2(void);
+HResp* handleh2c(void);
+HResp* sendupgradereq(void);
+int memmem(u8int*, int, u8int*, int);
+void acksettings(HConn*);
+int settingsframeresp(HConn*, TData*);
+int parsereq(HConn*, TData*);
+void initreq(HReq*);
+void initresp(HResp*);
+void initstream(HStream *s);

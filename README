@@ -1,0 +1,54 @@
+http/2 for 9front
+
+for the butler summer institute of butler university, 2017
+
+things to keep in mind for sake of simplicity:
+
+1: if a request is identified to be an HTTP/1.1 document that does not contain a "Connection: Upgrade" 
+header, ALWAYS send a "426 Upgrade Required" response. In other words, ignore any attempt for a client to 
+have an HTTP/1.1 conversation.
+
+2: ignore any client requested HTTP2-Settings. such settings are hardcoded in the server.
+
+3: no encryption anywhere anytime
+
+4: the only acceptable mime types to serve to clients are:
+	- text/plain
+	- text/html
+	- text/css
+	- image/bmp
+	- image/png
+	- image/jpeg
+
+5: handle only the following headers, ignoring all others:
+	client (request) headers:
+	- Accept:
+	- Accept-Charset:
+	- Accept-Encoding:
+	- Accept-Language:
+	- Accept-Datetime:
+	- Cache-Control:
+	- Content-Length:
+	- Content-Type:
+	- Date:
+	- Host:
+	- If-Modified-Since:
+
+	server (response) headers:
+	- Content-Type:
+	- Content-Length:
+	- Content-Language:
+	- Date:
+	- Last-Modified:
+	- Server:
+	- Upgrade:
+
+In most, cases, the server should respond with documents of this format:
+:status: 200
+:version: HTTP/2.0
+date: Wed, 30 May 2014 10:42:32 EST
+server: 9front (Plan 9)
+content-type: text/html
+content-length: 808
+
+<html><body><h1>message for you sir</h1><body><html>

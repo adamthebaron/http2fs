@@ -1,0 +1,4 @@
+reimplement huffmanenc and huffmandec (encode and decode strings)
+clean out the code cause its a mess dude
+implement stream support (multiplex single tcp connection)
+integrate hpack for use in HEADERS frames
