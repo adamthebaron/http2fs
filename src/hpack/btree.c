@@ -72,7 +72,7 @@ inittree(void)
 			}
 		}
 		current->symbol = i;
-		//print("added %c at addr %x\n", i, current);
+		print("added %c at addr %x\n", i, current);
 	}
 	return;			
 }
