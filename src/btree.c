@@ -60,7 +60,7 @@ gentree(void) {
 				cur = next;
 			}
 		}
-		//print("storing data elem %d of size %d\n", i, HuffmanTable[i].len);
+		print("storing data elem %d of size %d\n", i, HuffmanTable[i].len);
 		cur->huffman->data = HuffmanTable[i].data;
 		cur->huffman->len = HuffmanTable[i].len;
 	}
