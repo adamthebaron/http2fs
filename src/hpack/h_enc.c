@@ -62,19 +62,13 @@ h_encint(u8int* rep, u64int *len, u64int num, u8int bpref) {
 	}
 }
 
-/* encode data with huffman compression
- * and store in rep
- * len is size of orig data
- * replen is size of representation
- */
-
 /*
  * h_huffmanenc
  */
 void
 h_huffmanenc(u8int *data, u8int *rep, u16int len, u8int *replen)
 {
-	// does this actually work?
+	// yes
 	u8int *pos;
 	u32int cur;
 	u32int n;
