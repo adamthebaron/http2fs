@@ -67,45 +67,50 @@ h_encint(u8int* rep, u64int *len, u64int num, u8int bpref) {
  * len is size of orig data
  * replen is size of representation
  */
+
+/*
+ * h_huffmanenc
+ */
 void
 h_huffmanenc(u8int *data, u8int *rep, u16int len, u8int *replen)
 {
 	// does this actually work?
-	u8int *ptr;
-	u64int cur;
+	u8int *pos;
+	u32int cur;
 	u32int n;
 	HuffmanSymbol node;
 
-	ptr = rep;
+	print("in h_huffmanenc with %s\n", (char*) data);
+	pos = rep;
+	n = 0;
+	cur = 0;
 	for(int i = 0; i < len; i++)
 	{
 		node = HuffmanTable[*(data + i)];
-		//print("encoding char %c: 0x%x\n", *(data + i), node.data);
-		u32int code = node.data;
-		u32int nbits = node.len;
-		cur <<= nbits;
-		cur |= code;
-		n += nbits;
+		print("encoding char %c: 0x%x %0b\n", *(data + i), node.data, node.data);
+		cur <<= node.len;
+		cur |= node.data;
+		n += node.len;
 
 		while(n >= 8)
 		{
 			n -= 8;
-			*ptr++ = cur >> n;
+			*pos++ = cur >> n;
 		}
 	}
 	if(n > 0)
 	{
 		cur <<= (8 - n);
 		cur |= (0xFF >> n);
-		*ptr++ = cur;
+		*pos++ = cur;
 	}
-	*replen = ptr - rep;
+	*replen = pos - rep;
 	print("rep: ");
 	for(int i = 0; i < *replen; i++)
-		print("%b ", rep[i]);
+		print("%0b ", rep[i]);
 	print("\n");
 	for(int i = 0; i < *replen; i++)
-		print("%x", rep[i]);
+		print("%x ", rep[i]);
 	print("\n");
 	return;
 }
