@@ -4,6 +4,10 @@
 
 #include "http2fs.h"
 
+/*
+ * u_prefixarr
+ */
+
 void
 u_prefixarr(u8int *s, int ssize, int *arr) {
 	int k;
@@ -21,11 +25,9 @@ u_prefixarr(u8int *s, int ssize, int *arr) {
 	return;
 }
 
-/* knuth morris prat implementation
- * hsize: size of haystack in bytes
- * nsize: size of needle in bytes
- * return offset in arr where match was found
- * 0: match not found */
+/*
+ * u_submem
+ */
 int
 u_submem(u8int *haystack, int hsize, u8int *needle, int nsize) {
 	int k; // num of bytes matched
