@@ -1,18 +1,26 @@
+/* max size of http buffer in bytes (64kb) */
 #define MaxBuf			64 * 1024
+/* total number of headers allowed per req */
 #define MaxHeaders		64
+/* total size in bytes of a single header */
 #define MaxHeaderSize	2048
 
+/* hardcoded http response to go from http/1 to http/2 */
 extern const char Upgradereq[];
 extern const char Upgradeh2c[];
 
+/* crlf needed for http1 */
 static u8int CRLF[2] = {
 	0x0d, 0x0a,
 };
 
+/* "GET" */
 static u8int GET[3] = {
 	0x47, 0x45, 0x54,
 };
 
+/* magic connection prefix
+ * 0x505249202a20485454502f322e300d0a0d0a534d0d0a0d0a */
 static u8int Http2ConnPrefix[24] = {
 	0x50, 0x52, 0x49, 0x20, 0x2a, 0x20, 0x48,
 	0x54, 0x54, 0x50, 0x2f, 0x32, 0x2e, 0x30,
@@ -20,11 +28,13 @@ static u8int Http2ConnPrefix[24] = {
 	0x0a, 0x0d, 0x0a,
 };
 
+/* test SETTINGS frame */
 static u8int RawHttp2SettingsFrame[9] = {
 	0x00, 0x00, 0x24, 0x04, 0x00, 0x00, 0x00, 0x00,
 	0x00,
 };
 
+/* test ACK frame */
 static u8int AckSettingsFrame[9] = {
 	0x00, 0x00, 0x00, 0x04, 0x01, 0x00, 0x00, 0x00, 0x00,
 };
@@ -46,12 +56,18 @@ typedef struct HReq HReq;
 typedef struct HResp HResp;
 typedef struct HConn HConn;
 typedef struct HSettings HSettings;
+
+/* thread data
+ * acfd, anfd, lnfd: file descriptors for tcp connection
+ * pid: proc id
+ * adir[], ldir[]: tcp connection on filesystem */
 typedef struct TData TData;
 struct TData {
 	int acfd, anfd, lnfd, pid;
 	char adir[64], ldir[64];
 };
 
+/* HStatusCodes indexes */
 enum statuscodes {
 	HContinue,
 	HSwitchProto,
@@ -96,6 +112,7 @@ enum statuscodes {
 	HVerNotSupported
 };
 
+/* should we delete these? */
 static char* HStatuscodes[] = {
 	[HContinue]					"100 Continue",
 	[HSwitchProto]				"101 Switching Protocols",
@@ -190,6 +207,7 @@ struct HResp {
 	u8int buf[MaxBuf];
 };
 
+/* http/2 stream structure */
 struct HStream {
 	u32int id;
 	HResp *resp;
@@ -228,7 +246,7 @@ void createreq(HReq*, uchar*);
 void handleh2(void);
 HResp* handleh2c(void);
 HResp* sendupgradereq(void);
-int memmem(u8int*, int, u8int*, int);
+int submem(u8int*, int, u8int*, int);
 void acksettings(HConn*);
 int settingsframeresp(HConn*, TData*);
 int parsereq(HConn*, TData*);

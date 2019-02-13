@@ -21,13 +21,13 @@ prefixarr(u8int *s, int ssize, int *arr) {
 	return;
 }
 
-// knuth morris prat implementation
-// hsize: size of haystack in bytes
-// nsize: size of needle in bytes
-// return offset in arr where match was found
-// 0: match not found
+/* knuth morris prat implementation
+ * hsize: size of haystack in bytes
+ * nsize: size of needle in bytes
+ * return offset in arr where match was found
+ * 0: match not found */
 int
-memmem(u8int *haystack, int hsize, u8int *needle, int nsize) {
+submem(u8int *haystack, int hsize, u8int *needle, int nsize) {
 	int k; // num of bytes matched
 	int *prefix; // prefix array (variable size)
 

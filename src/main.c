@@ -38,8 +38,8 @@ initresp(HResp *resp)
 void
 initstream(HStream *s)
 {
-	s->req    = (HReq*) malloc(sizeof(HReq));
-	s->resp   = (HResp*) malloc(sizeof(HResp));
+	s->req = (HReq*) malloc(sizeof(HReq));
+	s->resp = (HResp*) malloc(sizeof(HResp));
 	s->parent = (HStream*) malloc(sizeof(HStream));
 	initreq(s->req);
 	initresp(s->resp);
