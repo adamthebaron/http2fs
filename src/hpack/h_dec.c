@@ -57,13 +57,19 @@ h_huffmandec(u8int* data, u8int *rep, u16int len)
 	{
 		currep = rep[i];
 		print("checking %b\n", currep);
-		mask = 128;
+		mask = 0x80;
 		while(mask > 0)
 		{
 			if((currep & mask) == mask)
+			{
+				print("currep & mask == 1 going right\n");
 				current = current->right;
+			}
 			else
+			{
+				print("currep & mask == 0 going left\n");
 				current = current->left;
+			}
 			if(current->symbol != -1)
 			{
 				print("adding %c (hex %x)\n", current->symbol, current->symbol);
