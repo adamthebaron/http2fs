@@ -4,7 +4,7 @@
 #include <thread.h>
 
 #include "http2fs.h"
-#include "hpack.h"
+#include "hpack/h_hpack.h"
 
 /* thread stack sizes used by thread(2) */
 
@@ -126,7 +126,7 @@ hdrframresp(u8int *frame, uint s)
 				print("huffman encoded\n");
 			len = 0x3F & frame[pos];
 			print("size: %d, index: %d\ndecoding...", len, index);
-			huffmandec(hufbuf, frame, len);
+			h_huffmandec(hufbuf, frame, len);
 			print("decoded, got: %s\n", hufbuf);
 			pos += len + 1;
 		}
