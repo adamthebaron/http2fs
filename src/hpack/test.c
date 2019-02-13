@@ -24,8 +24,8 @@ main(int argc, char** argv)
 	print("decoding...");
 	huffmandec((u8int*) decodedstr, encodedstr, replen);
 	print("got %s\n", (char*) decodedstr);
-	//free(encodedstr);
-	//free(decodedstr);
-	//freenode(rootnode);
+	free(encodedstr);
+	free(decodedstr);
+	freenode(rootnode);
 	exits(0);
 }

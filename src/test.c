@@ -19,7 +19,7 @@ main(int argc, char** argv) {
 	for (int i = 0; i < a2size; i++)
 		memcpy(&c2[i], &a2[i], 1);
 	int stuff;
-	if ((stuff = memmem(c1, a1size, c2, a2size)))
+	if ((stuff = submem(c1, a1size, c2, a2size)))
 		print("found match at index: %d\n", stuff);
 	else
 		print("match not found\n");
