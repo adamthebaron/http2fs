@@ -6,4 +6,13 @@ continued in 2019 for fun and to hopefully show off
 
 now written using p9p on linux and macos
 
-# dont use this im refactoring it right now and it wont work
+dont use this im refactoring it right now and it wont work
+
+
+source structure
+
+h_* hpack functions
+u_* utility functions
+n_* network functions
+t_* threading functions
+9_* 9p functions

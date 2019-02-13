@@ -5,7 +5,7 @@
 #include "http2fs.h"
 
 void
-prefixarr(u8int *s, int ssize, int *arr) {
+u_prefixarr(u8int *s, int ssize, int *arr) {
 	int k;
 
 	k = -1;
@@ -27,7 +27,7 @@ prefixarr(u8int *s, int ssize, int *arr) {
  * return offset in arr where match was found
  * 0: match not found */
 int
-submem(u8int *haystack, int hsize, u8int *needle, int nsize) {
+u_submem(u8int *haystack, int hsize, u8int *needle, int nsize) {
 	int k; // num of bytes matched
 	int *prefix; // prefix array (variable size)
 

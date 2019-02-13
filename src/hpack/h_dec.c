@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #include "../http2fs.h"
-#include "hpack.h"
+#include "h_hpack.h"
 
 /* decode hpack encoded integer
  * rep is the hpack representation of the integer
@@ -11,7 +11,7 @@
  * bpref is the prefix size
  * num is the result */
 void
-decint(u8int *rep, u64int *len, u64int *num, u8int bpref) {
+h_decint(u8int *rep, u64int *len, u64int *num, u8int bpref) {
 	u64int m, max;
 
 	m = 0;
@@ -44,7 +44,7 @@ decint(u8int *rep, u64int *len, u64int *num, u8int bpref) {
  * and store in data
  */
 void
-huffmandec(u8int* data, u8int *rep, u16int len)
+h_huffmandec(u8int* data, u8int *rep, u16int len)
 {
 	u8int mask, currep, pos;
 	HNode* current;
@@ -77,56 +77,3 @@ huffmandec(u8int* data, u8int *rep, u16int len)
 	return;
 }
 
-/** indexed header field representation 6.1 **/
-
-/* decode indexed header (0x80) 6.1
- *   0   1   2   3   4   5   6   7
- * +---+---+---+---+---+---+---+---+
- * | 1 |        Index (7+)         |
- * +---+---------------------------+ 
-u8int *
-dechdrind(u8int* buf) {
-
-}*/
-
-/** literal header field representations 6.2 **/
-
-/* decode literal header with indexing (0x40) 6.2.1
- *   0   1   2   3   4   5   6   7
- * +---+---+---+---+---+---+---+---+
- * | 0 | 1 |      Index (6+)       |
- * +---+---+-----------------------+
- * | H |     Value Length (7+)     |
- * +---+---------------------------+
- * | Value String (Length octets)  |
- * +-------------------------------+
- * indexed name
- *   0   1   2   3   4   5   6   7
- * +---+---+---+---+---+---+---+---+
- * | 0 | 1 |           0           |
- * +---+---+-----------------------+
- * | H |     Name Length (7+)      |
- * +---+---------------------------+
- * |  Name String (Length octets)  |
- * +---+---------------------------+
- * | H |     Value Length (7+)     |
- * +---+---------------------------+
- * | Value String (Length octets)  |
- * +-------------------------------+
- * new name
-u8int*
-dechdrlitind(u8int* buf) {
-
-}*/
-
-/* decode literal header without indexing (0x0) 6.2.2 
-u8int*
-dechdrlitnind(u8int* buf) {
-
-}*/
-
-/* decode literal header never index (0x10) 6.2.3 
-u8int*
-dechdrlitneind(u8int* buf) {
-
-}*/
