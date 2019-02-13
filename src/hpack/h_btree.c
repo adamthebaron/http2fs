@@ -3,13 +3,13 @@
 #include <stdio.h>
 
 #include "../http2fs.h"
-#include "hpack.h"
+#include "h_hpack.h"
 
 HNode*
-newnode(void) {
+h_newnode(void) {
 	HNode *node;
 
-	node = malloc(1 * sizeof(HNode));
+	node = calloc(1, sizeof(HNode));
 	node->symbol = -1;
 	node->len = 0;
 	node->left = nil;
@@ -18,12 +18,12 @@ newnode(void) {
 }
 
 void
-freenode(HNode *node)
+h_freenode(HNode *node)
 {
 	if(node->left != nil)
-		freenode(node->left);
+		h_freenode(node->left);
 	if(node->right != nil)
-		freenode(node->right);
+		h_freenode(node->right);
 	if(node->left == nil && node->right == nil)
 		free(node);
 	node = nil;
@@ -31,18 +31,18 @@ freenode(HNode *node)
 }
 
 void
-inittree(void)
+h_inittree(void)
 {
-	HuffmanNode node;
+	HuffmanSymbol node;
 	HNode* current;
 	HNode* next;
 	u32int mask;
 
-	rootnode = newnode();
+	rootnode = h_newnode();
 	current = nil;
 	next = nil;
-	mask = 0;
-	for(int i = 0; i < 258; i++)
+	mask = 0x000000000;
+	for(int i = 0; i < 257; i++)
 	{
 		node = HuffmanTable[i];
 		current = rootnode;
@@ -55,7 +55,7 @@ inittree(void)
 				next = current->right;
 				if(next == nil)
 				{
-					next = newnode();
+					next = h_newnode();
 					current->right = next;
 				}
 				current = next;
@@ -65,28 +65,27 @@ inittree(void)
 				next = current->left;
 				if(next == nil)
 				{
-					next = newnode();
+					next = h_newnode();
 					current->left = next;
 				}
 				current = next;
 			}
 		}
 		current->symbol = i;
-		print("added %c at addr %x\n", i, current);
 	}
 	return;			
 }
 
 void
-printtree(HNode* root)
+h_printtree(HNode* root)
 {
 	HNode* cur;
 
 	cur = root;
 	if(cur->left != nil)
-		printtree(cur->left);
+		h_printtree(cur->left);
 	if(cur->right != nil)
-		printtree(cur->right);
+		h_printtree(cur->right);
 	print("at addr %x with symbol %c\n", cur, cur->symbol);
 	return;
 }

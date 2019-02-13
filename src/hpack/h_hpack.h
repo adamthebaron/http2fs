@@ -1,11 +1,12 @@
-typedef struct HuffmanNode HuffmanNode;
-struct HuffmanNode {
+typedef struct HuffmanSymbol HuffmanSymbol;
+struct HuffmanSymbol {
 	u64int data;
 	uint len;
 };
 
-/* 257 elements */
-static HuffmanNode HuffmanTable[257] = {
+/* 257 elements
+ * {data, len} */
+static HuffmanSymbol HuffmanTable[257] = {
 	{0x1ff8, 13},
 	{0x7fffd8, 23},
 	{0xfffffe2, 28},
@@ -335,20 +336,19 @@ typedef struct HNode HNode;
 struct HNode {
 	u32int symbol;
 	u8int len;
-	//HNode* child[256];
 	HNode* left;
 	HNode* right;
 };
 HNode* rootnode;
 
-void strtohex(char*, char*, long);
-void hextostr(char*, char*);
-void encint(u8int*, u64int*, u64int, u8int);
-void decint(u8int*, u64int*, u64int*, u8int);
-HNode* gentree(void);
-void huffmanenc(u8int*, u8int*, u16int, u8int*);
-void huffmandec(u8int*, u8int*, u16int);
-void inittree(void);
-void addnode(u8int symbol, u32int code, u8int len);
-void freenode(HNode*);
-void printtree(HNode*);
+void h_strtohex(char*, char*, long);
+void h_hextostr(char*, char*);
+void h_encint(u8int*, u64int*, u64int, u8int);
+void h_decint(u8int*, u64int*, u64int*, u8int);
+HNode* h_gentree(void);
+void h_huffmanenc(u8int*, u8int*, u16int, u8int*);
+void h_huffmandec(u8int*, u8int*, u16int);
+void h_inittree(void);
+void h_addnode(u8int symbol, u32int code, u8int len);
+void h_freenode(HNode*);
+void h_printtree(HNode*);

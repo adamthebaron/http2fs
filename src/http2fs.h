@@ -1,3 +1,6 @@
+#ifndef _HTTPFS_H_
+#define _HTTPFS_H_
+
 /* max size of http buffer in bytes (64kb) */
 #define MaxBuf			64 * 1024
 /* total number of headers allowed per req */
@@ -253,3 +256,5 @@ int parsereq(HConn*, TData*);
 void initreq(HReq*);
 void initresp(HResp*);
 void initstream(HStream *s);
+
+#endif /* _HTTPFS_H_ */
