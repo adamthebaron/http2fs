@@ -1,7 +1,5 @@
-#include <u.h>
-#include <libc.h>
-#include <stdio.h>
-
+#include "../http2fs.h"
+#include "u_util.h"
 /*
  * u_prefixarr
  */

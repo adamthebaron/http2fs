@@ -1,6 +1,15 @@
 #ifndef _HTTPFS_H_
 #define _HTTPFS_H_
 
+#include <u.h>
+#include <libc.h>
+#include <stdio.h>
+#include <thread.h>
+#include <bio.h>
+
+/* it looks cool */
+#define forever for(;;)
+
 /* max size of http buffer in bytes (64kb) */
 #define MaxBuf			64 * 1024
 /* total number of headers allowed per req */

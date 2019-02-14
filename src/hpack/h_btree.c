@@ -1,7 +1,3 @@
-#include <u.h>
-#include <libc.h>
-#include <stdio.h>
-
 #include "../http2fs.h"
 #include "h_hpack.h"
 
