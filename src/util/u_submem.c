@@ -30,7 +30,7 @@ u_submem(u8int *haystack, int hsize, u8int *needle, int nsize) {
 	int *prefix; // prefix array (variable size)
 
 	prefix = malloc(nsize * sizeof(int));
-	prefixarr(needle, nsize, prefix);
+	u_prefixarr(needle, nsize, prefix);
 	k = -1;
 	for (int i = 0; i < hsize; i++) {
 		while (k > -1 && needle[k + 1] != haystack[i])
