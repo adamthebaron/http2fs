@@ -2,8 +2,6 @@
 #include <libc.h>
 #include <stdio.h>
 
-#include "http2fs.h"
-
 /*
  * u_prefixarr
  */
