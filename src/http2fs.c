@@ -9,7 +9,11 @@
 #include "thread/t_thread.h"
 
 TData Tdata[1024];
-
+int stacksize = 8192;
+int mainstacksize = 8192;
+int t_threadcount = 1024;
+#define t_stacksize stacksize
+extern void t_responseproc(void*);
 void
 initreq(HReq *req)
 {
@@ -71,7 +75,7 @@ parsereq(HConn *conn, TData *data)
 	print("parsing\n");
 	fbuf = (u8int*) malloc(MaxBuf * sizeof(u8int));
 	framelen = curlen = 0;
-	for(curpos=0; curpos<conn->rreq.len; curpos+=framelen)
+	for(curpos = 0; curpos < conn->rreq.len; curpos += framelen)
 	{
 		print("curpos: %d of %d bytes\n", curpos, conn->rreq.len);
 		if(!memcmp(&(conn->rreq.buf[curpos]), Http2ConnPrefix, 3))
@@ -100,7 +104,7 @@ parsereq(HConn *conn, TData *data)
 			case 0x1:
 				/* headers frame */
 				conn->rreq.curpos = curpos;
-				u_hdrframresp(fbuf, framelen + 9);
+				u_hdrframeresp(fbuf, framelen + 9);
 				break;
 			case 0x2:
 				/* priority frame */
@@ -110,12 +114,12 @@ parsereq(HConn *conn, TData *data)
 			case 0x3:
 				/* rststream frame */
 				conn->rreq.curpos = curpos;
-				rstframeresp(conn);
+				//u_rstframeresp(conn);
 				break;
 			case 0x4:
 				/* settings frame */
 				conn->rreq.curpos = curpos;
-				if(u_settingsframeresp(conn, data))
+				if(u_stgsframeresp(conn, data))
 					return 1;
 				break;
 			case 0x5:
@@ -183,7 +187,7 @@ threadmain(int argc, char **argv)
 	int acfd, lnfd, anfd, i;
 	char adir[64], ldir[64];
 
-	gentree();
+	h_inittree();
 	i = 0;
 	anfd = announce("tcp!*!80", adir);
 	if(anfd < 0)
@@ -212,5 +216,6 @@ threadmain(int argc, char **argv)
 		strcpy(Tdata[i].ldir, ldir);
 		proccreate(t_responseproc, &Tdata[i], t_stacksize);
 	}
-	exits(0);
+	threadexitsall(0);
+	threadexits(0);
 }
