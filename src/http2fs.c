@@ -5,6 +5,10 @@
 
 #include "http2fs.h"
 #include "hpack/h_hpack.h"
+#include "util/u_util.h"
+#include "thread/t_thread.h"
+
+TData Tdata[1024];
 
 void
 initreq(HReq *req)
@@ -75,7 +79,6 @@ parsereq(HConn *conn, TData *data)
 			/* request has conn prefix */
 			framelen = 24;
 			print("found conn prefix\n");
-			http2initrespond(conn);
 			continue;
 		}
 		framelen = (conn->rreq.buf[curpos] << 16) | 
@@ -92,17 +95,17 @@ parsereq(HConn *conn, TData *data)
 			case 0x0:
 				/* data frame */
 				conn->rreq.curpos = curpos;
-				dataframeresp(fbuf);
+				//u_dataframeresp(fbuf);
 				break;
 			case 0x1:
 				/* headers frame */
 				conn->rreq.curpos = curpos;
-				hdrframresp(fbuf, framelen + 9);
+				u_hdrframresp(fbuf, framelen + 9);
 				break;
 			case 0x2:
 				/* priority frame */
 				conn->rreq.curpos = curpos;
-				priframeresp(conn);
+				//u_priframeresp(conn);
 				break;
 			case 0x3:
 				/* rststream frame */
@@ -112,33 +115,33 @@ parsereq(HConn *conn, TData *data)
 			case 0x4:
 				/* settings frame */
 				conn->rreq.curpos = curpos;
-				if(settingsframeresp(conn, data))
+				if(u_settingsframeresp(conn, data))
 					return 1;
 				break;
 			case 0x5:
 				/* push promise frame */
 				conn->rreq.curpos = curpos;
-				pushpframeresp(conn);
+				//u_pushpframeresp(conn);
 				break;
 			case 0x6:
 				/* ping frame */
 				conn->rreq.curpos = curpos;
-				pingframeresp(conn);
+				//u_pingframeresp(conn);
 				break;
 			case 0x7:
 				/* goaway frame */
 				conn->rreq.curpos = curpos;
-				goawayframeresp(conn);
+				//u_goawayframeresp(conn);
 				break;
 			case 0x8:
 				/* winup frame */
 				conn->rreq.curpos = curpos;
-				winupframeresp(conn);
+				//u_winupframeresp(conn);
 				break;
 			case 0x9:
 				/* cont frame */
 				conn->rreq.curpos = curpos;
-				contframeresp(conn);
+				//u_contframeresp(conn);
 				break;
 		}
 		curpos += 9;
@@ -183,21 +186,21 @@ threadmain(int argc, char **argv)
 	gentree();
 	i = 0;
 	anfd = announce("tcp!*!80", adir);
-	if(anfd<0)
+	if(anfd < 0)
 	{
 		perror("announce()");
 		exits(0);
 	}
-	for(;;)
+	forever
 	{
 		lnfd = listen(adir, ldir);
-		if(lnfd<0)
+		if(lnfd < 0)
 		{
 			perror("listen()");
 			exits(0);
 		}
 		acfd = accept(lnfd, ldir);
-		if(acfd<0)
+		if(acfd < 0)
 		{
 			perror("accept()");
 			exits(0);
@@ -207,7 +210,7 @@ threadmain(int argc, char **argv)
 		Tdata[i].lnfd = lnfd;
 		strcpy(Tdata[i].adir, adir);
 		strcpy(Tdata[i].ldir, ldir);
-		proccreate(respproc, &Tdata[i], stacksize);
+		proccreate(t_responseproc, &Tdata[i], t_stacksize);
 	}
 	exits(0);
 }

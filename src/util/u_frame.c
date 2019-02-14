@@ -1,5 +1,6 @@
 #include "../http2fs.h"
 #include "u_util.h"
+#include "../hpack/h_hpack.h"
 
 /*
  * HEADER frame function
@@ -14,7 +15,7 @@ u_hdrframeresp(u8int* frame, uint s)
 	/* set pos to 9 to jump over frame header
 	 * we want the meat on this bone */
 	pos = 9;
-	huffmanbuff = calloc(1024, sizeof(u8int));
+	huffmanbuffer = calloc(1024, sizeof(u8int));
 	while(pos < s)
 	{
 		print("checking 0x%x\n", frame[pos]);
@@ -25,7 +26,7 @@ u_hdrframeresp(u8int* frame, uint s)
 			index = (0x7f & frame[pos]) - 1;
 			print("0x%x\n", index);
 			print("header is: %s:%s\n", hpackstatictable[index].name,
-										hpackstatictable[index.val);
+										hpackstatictable[index].val);
 			pos++;
 		}
 		/* literal header field with incremental indexing (6.2.1) */
