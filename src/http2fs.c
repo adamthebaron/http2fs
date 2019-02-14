@@ -193,7 +193,7 @@ threadmain(int argc, char **argv)
 	if(anfd < 0)
 	{
 		perror("announce()");
-		exits(0);
+		threadexitsall("threadmain");
 	}
 	forever
 	{
@@ -201,13 +201,13 @@ threadmain(int argc, char **argv)
 		if(lnfd < 0)
 		{
 			perror("listen()");
-			exits(0);
+			threadexitsall("threadmain");
 		}
 		acfd = accept(lnfd, ldir);
 		if(acfd < 0)
 		{
 			perror("accept()");
-			exits(0);
+			threadexitsall("threadmain");
 		}
 		Tdata[i].acfd = acfd;
 		Tdata[i].anfd = anfd;
@@ -216,6 +216,6 @@ threadmain(int argc, char **argv)
 		strcpy(Tdata[i].ldir, ldir);
 		proccreate(t_responseproc, &Tdata[i], t_stacksize);
 	}
-	threadexitsall(0);
-	threadexits(0);
+	threadexitsall("threadmain");
+	//threadexits(0);
 }
