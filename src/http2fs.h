@@ -64,8 +64,7 @@ static u8int RawHttp2Settings[45] = {
 typedef struct HMethod HMethod;
 typedef struct HHeader HHeader;
 typedef struct HStream HStream;
-typedef struct HReq HReq;
-typedef struct HResp HResp;
+typedef struct HMsg HMsg;
 typedef struct HConn HConn;
 typedef struct HSettings HSettings;
 
@@ -106,15 +105,15 @@ enum statuscodes {
 	HMethNotAllowed,
 	HNotAcceptable,
 	HProxyAuthRequired,
-	HReqTimeout,
+	HMsgTimeout,
 	HConflict,
 	HGone,
 	HLengthRequired,
 	HPrecondFailed,
-	HReqEntityTooLarge,
-	HReqURITooLong,
+	HMsgEntityTooLarge,
+	HMsgURITooLong,
 	HUnsupportedMediaType,
-	HReqRangeNotSatisfiable,
+	HMsgRangeNotSatisfiable,
 	HExpectationFailed,
 	HInternalServerError,
 	HNotImplemented,
@@ -151,15 +150,15 @@ static char* HStatuscodes[] = {
 	[HMethNotAllowed]			"405 Method Not Allowed",
 	[HNotAcceptable]			"406 Not Acceptable",
 	[HProxyAuthRequired]		"407 Proxy Authentication Required",
-	[HReqTimeout]				"408 Request Timeout",
+	[HMsgTimeout]				"408 Request Timeout",
 	[HConflict]					"409 Conflict",
 	[HGone]						"410 Gone",
 	[HLengthRequired]			"411 Length Required",
 	[HPrecondFailed]			"412 Precondition Failed",
-	[HReqEntityTooLarge]		"413 Request Entity Too Large",
-	[HReqURITooLong]			"414 Request-URI Too Long",
+	[HMsgEntityTooLarge]		"413 Request Entity Too Large",
+	[HMsgURITooLong]			"414 Request-URI Too Long",
 	[HUnsupportedMediaType]		"415 Unsupported Media Type",
-	[HReqRangeNotSatisfiable]	"416 Requested Range Not Satisfiable",
+	[HMsgRangeNotSatisfiable]	"416 Requested Range Not Satisfiable",
 	[HExpectationFailed]		"417 Expectation Failed",
 	[HInternalServerError]		"500 Internal Server Error",
 	[HNotImplemented]			"501 Not Implemented",
@@ -194,44 +193,37 @@ enum http2settings {
 
 /* method data structure */
 struct HMethod {
-	uchar method[8];	/* "verb" of method */
-	uchar url[256];		/* location of document requested */
-	uchar version[8];	/* http version */
+	char method[8];	/* "verb" of method */
+	char url[256];		/* location of document requested */
+	char version[8];	/* http version */
 };
 
 /* header data structure */
 struct HHeader {
-	uchar name[64]; /* name of header (Content-Type, Upgrade, etc) */
-	uchar val[256]; /* value of respective header */
+	char name[64]; /* name of header (Content-Type, Upgrade, etc) */
+	char val[256]; /* value of respective header */
 };
 
-/* http request data structure */
-struct HReq {
-	u32int len;
-	u32int curpos;
-	u8int buf[MaxBuf];
-};
-
-/* http response data structure */
-struct HResp {
-	u32int len;
-	u32int curpos;
+/* http message data structure */
+struct HMsg {
+	u64int len;
+	u64int curpos;
 	u8int buf[MaxBuf];
 };
 
 /* http/2 stream structure */
 struct HStream {
-	u32int id;
-	HResp *resp;
-	HReq *req;
+	u64int id;
+	HMsg *resp;
+	HMsg *req;
 	HStream *parent;
 	HStream *child[32];
 };
 
 /* connection state */
 struct HConn {
-	HReq rreq;
-	HResp rresp;
+	HMsg rreq;
+	HMsg rresp;
 	HStream *stream[256];
 	//NetConnInfo *conninfo;	/* network info about connection */
 };
@@ -254,16 +246,11 @@ static HSettings defaultsettings[6] = {
 
 char* getword(char*);
 void main(int, char*[]);
-void createreq(HReq*, uchar*);
-void handleh2(void);
-HResp* handleh2c(void);
-HResp* sendupgradereq(void);
-int submem(u8int*, int, u8int*, int);
-void acksettings(HConn*);
-int settingsframeresp(HConn*, TData*);
+void createreq(HMsg*, uchar*);
+int u_submem(u8int*, int, u8int*, int);
 int parsereq(HConn*, TData*);
-void initreq(HReq*);
-void initresp(HResp*);
+void initreq(HMsg*);
+void initresp(HMsg*);
 void initstream(HStream *s);
 
 #endif /* _HTTPFS_H_ */

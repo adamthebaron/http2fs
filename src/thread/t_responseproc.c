@@ -15,8 +15,10 @@ t_responseproc(void* arg)
 
 	tid = n = 0;
 	initconn(&conn, tid, 0);
-	data = arg;
+	data = (TData*) arg;
 	data->pid = getpid();
+	print("got Tdata: %s %s %d %d %d\n", data->adir, data->ldir, data->acfd,
+										 data->anfd, data->lnfd);
 	print("in proc %d\n", data->pid);
 	print("reading from %s and fd %d\n", data->adir, data->acfd);
 	//while((n = pread(data->acfd, conn.rreq.buf, MaxBuf, 0)) > 0)
@@ -25,7 +27,8 @@ t_responseproc(void* arg)
 		print("read data... ");
 		conn.rreq.len = n;
 		print("got %d bytes\n", conn.rreq.len);
-		parsereq(&conn, data);
+		print("raw data: %x\n", conn.rreq.buf);
+		u_parsereq(&conn, data);
 		pwrite(data->acfd, conn.rresp.buf, conn.rresp.len, 0);
 	}
 }

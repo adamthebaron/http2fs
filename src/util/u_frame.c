@@ -7,7 +7,7 @@
  * u_hdrframeresp
  */
 void
-u_hdrframeresp(u8int* frame, uint s)
+u_hdrframeresp(u8int* frame, uint framelen)
 {
 	u8int len, index, pos;
 	u8int* huffmanbuffer;
@@ -16,14 +16,14 @@ u_hdrframeresp(u8int* frame, uint s)
 	 * we want the meat on this bone */
 	pos = 9;
 	huffmanbuffer = calloc(1024, sizeof(u8int));
-	while(pos < s)
+	while(pos < framelen)
 	{
 		print("checking 0x%x\n", frame[pos]);
 		/* indexed header field rep (6.1) */
 		if(frame[pos] & 0x80)
 		{
 			print("indexed header field, index: ");
-			index = (0x7f & frame[pos]) - 1;
+			index = (frame[pos] & 0x7f) - 1;
 			print("0x%x\n", index);
 			print("header is: %s:%s\n", hpackstatictable[index].name,
 										hpackstatictable[index].val);

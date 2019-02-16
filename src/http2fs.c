@@ -15,7 +15,7 @@ int t_threadcount = 1024;
 #define t_stacksize stacksize
 extern void t_responseproc(void*);
 void
-initreq(HReq *req)
+initreq(HMsg *req)
 {
 	req->len = 0;
 	req->curpos = 0;
@@ -24,7 +24,7 @@ initreq(HReq *req)
 }
 
 void
-initresp(HResp *resp)
+initresp(HMsg *resp)
 {
 	resp->len = 0;
 	resp->curpos = 0;
@@ -35,8 +35,8 @@ initresp(HResp *resp)
 void
 initstream(HStream *s)
 {
-	s->req = (HReq*) malloc(sizeof(HReq));
-	s->resp = (HResp*) malloc(sizeof(HResp));
+	s->req = (HMsg*) malloc(sizeof(HMsg));
+	s->resp = (HMsg*) malloc(sizeof(HMsg));
 	s->parent = (HStream*) malloc(sizeof(HStream));
 	initreq(s->req);
 	initresp(s->resp);
@@ -98,9 +98,9 @@ threadmain(int argc, char **argv)
 		Tdata[i].lnfd = lnfd;
 		strcpy(Tdata[i].adir, adir);
 		strcpy(Tdata[i].ldir, ldir);
-		print("Tdata[%d]: %s %s %d %d %d\n", i, Tdata[i].adir, Tdata[i].ldir,
-											 Tdata[i].acfd, Tdata[i].anfd,
-											 Tdata[i].lnfd);
+		//print("Tdata[%d]: %s %s %d %d %d\n", i, Tdata[i].adir, Tdata[i].ldir,
+		//									 Tdata[i].acfd, Tdata[i].anfd,
+		//									 Tdata[i].lnfd);
 		proccreate(t_responseproc, &Tdata[i], t_stacksize);
 		i = i + 1 % 1024;
 	}
