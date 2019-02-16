@@ -9,7 +9,7 @@ u_parsereq(HConn* conn, TData* data)
 {
 	u8int frametype;
 	u8int* framebuf;
-	u32int curpos, curlen, framelen;
+	u64int curpos, curlen, framelen;
 
 	framebuf = calloc(MaxBuf, sizeof(u8int));
 	framelen = curlen = curpos = 0;
@@ -31,12 +31,13 @@ u_parsereq(HConn* conn, TData* data)
 			print("found connection prefix\n");
 			continue;
 		}
-		framelen = (conn->rreq.buf[curpos] << 16) |
-				   (conn->rreq.buf[curpos + 1] << 8) |
-				   conn->rreq.buf[curpos + 2];
+		// add 9 to framelen to include frame header
+		framelen = (conn->rreq.buf[curpos]     << 16) |
+				   (conn->rreq.buf[curpos + 1] << 8)  |
+				    conn->rreq.buf[curpos + 2] + 9;
 		frametype = conn->rreq.buf[curpos + 3];
 		print("http2 frame of type %x of size %d\n", frametype, framelen);
-		memcpy(framebuf, &(conn->rreq.buf[curpos]), framelen + 9);
+		memcpy(framebuf, &(conn->rreq.buf[curpos]), framelen);
 		switch(frametype)
 		{
 			case 0x0:
@@ -45,7 +46,8 @@ u_parsereq(HConn* conn, TData* data)
 				break;
 			case 0x1:
 				/* headers */
-				u_hdrframeresp(framebuf, framelen);
+				print("headers frame found\n");
+				u_hdrframeresp(framebuf, framelen, data->acfd);
 				break;
 			case 0x2:
 				/* priority */
@@ -57,7 +59,8 @@ u_parsereq(HConn* conn, TData* data)
 				break;
 			case 0x4:
 				/* settings */
-				u_stgsframeresp(conn, data);
+				print("settings frame found\n");
+				u_stgsframeresp(framebuf, framelen, data->acfd);
 				break;
 			case 0x5:
 				/* push promise */
@@ -73,6 +76,7 @@ u_parsereq(HConn* conn, TData* data)
 				break;
 			case 0x8:
 				/* winup */
+				print("window update frame found\n");
 				//u_winupframeresp();
 				break;
 			case 0x9:
@@ -80,7 +84,7 @@ u_parsereq(HConn* conn, TData* data)
 				//u_contframeresp();
 				break;
 		}
-		//curpos += 9;
+		curpos += framelen;
 		print ("curpos is now %d\n", curpos);
 	}
 	return;

@@ -67,6 +67,7 @@ typedef struct HStream HStream;
 typedef struct HMsg HMsg;
 typedef struct HConn HConn;
 typedef struct HSettings HSettings;
+typedef void (*framefunc) (u8int* framebuf, u64int framelen, uint fd);
 
 /* thread data
  * acfd, anfd, lnfd: file descriptors for tcp connection
