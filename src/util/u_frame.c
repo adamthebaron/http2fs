@@ -21,9 +21,11 @@ u_hdrframeresp(u8int* framebuf, u64int framelen, uint fd)
 {
 	u8int len, index, pos;
 	u8int* huffmanbuffer;
+	u8int* decodebuf;
 
 	pos = 9;
 	huffmanbuffer = calloc(1024, sizeof(u8int));
+	decodebuf = calloc(1024, sizeof(u8int));
 	u_printframe(framebuf, framelen);
 	while(pos < framelen)
 	{
@@ -42,17 +44,29 @@ u_hdrframeresp(u8int* framebuf, u64int framelen, uint fd)
 		else if(framebuf[pos] & 0x40)
 		{
 			print("literal header field with inc indexing\n");
-			index = 0x3f & framebuf[pos++];
-			if(!index)
+			index = 0x3f & framebuf[pos];
+			if(index == 0x0)
 				print("new header\n");
 			else
 				print("indexed header\n");
-			if(framebuf[pos] & 0x80)
+			if(framebuf[pos + 1] & 0x80)
 				print("huffman encoded\n");
-			len = framebuf[pos] & 0x3f;
-			print("size: %d index %d\ndecoding..", len, index);
-			h_huffmandec(huffmanbuffer, framebuf, len);
-			print("decoded.\ngot: %s\n", huffmanbuffer);
+			len = framebuf[pos + 1] & 0x3f;
+			print("size: %d index %d\n", len, index);
+			/* bitwise AND this byte with the msb unset
+			 * that bit is used to know if the header is
+			 * huffman encoded or not */
+			framebuf[pos + 1] &= 0x7f;
+			/* TODO: need to shift everything in huffmanbuffer
+			 * by one so as to not count msb in first byte
+			 * during binary tree traversal */
+			memcpy(huffmanbuffer, &(framebuf[pos + 1]), len);
+			print("huffmanbuffer contains: ");
+			for(u64int i = 0; i < len; i++)
+				print("%x ", huffmanbuffer[i]);
+			print("\ndecoding... ");
+			h_huffmandec(decodebuf, huffmanbuffer, len);
+			print("decoded.\ngot: %s\n", decodebuf);
 			pos += len + 1;
 		}
 		/* literal header field without indexing (6.2.2) */
@@ -74,6 +88,8 @@ u_hdrframeresp(u8int* framebuf, u64int framelen, uint fd)
 			pos += len + 1;
 		}
 	}
+	free(huffmanbuffer);
+	free(decodebuf);
 	return;
 }
 
