@@ -1,9 +1,28 @@
 #include "../http2fs.h"
 #include "u_util.h"
+
+/*
+ * u_shiftarr
+ * direction: 0x01 == left, 0x00 == right
+ */
+void
+u_shiftarr(u8int* arr, u64int arrlen, u8int shiftlen, u8int direction)
+{
+	u8int byte1, byte2;
+
+	byte1 = byte2 = 0;
+	byte1 = arr[0];
+	byte2 = arr[1] & shiftlen;
+	for(u64int i = 0; i < arrlen, i++)
+	{
+
+	}
+	return;
+}
+
 /*
  * u_prefixarr
  */
-
 void
 u_prefixarr(u8int *s, int ssize, int *arr) {
 	int k;
