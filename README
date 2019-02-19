@@ -16,3 +16,11 @@ u_* utility functions
 n_* network functions
 t_* threading functions
 9_* 9p functions
+
+big todo things
+
+- add support for tls through libsec
+- isoloate all hpack code and keep it in a dir or something
+- make sure that each thread has its own copy of dynamic header table
+  and streams and the like
+- get proper 9p support (the only thing that matters)
