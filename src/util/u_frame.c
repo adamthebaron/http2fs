@@ -50,12 +50,12 @@ u_hdrframeresp(u8int* framebuf, u64int framelen, uint fd)
 		else if(framebuf[pos] & 0x40)
 		{
 			print("literal header field with inc indexing\n");
-			/* no. */
-			index = 0x3f & framebuf[pos];
+			index = framebuf[pos] & 0x3f;
 			if(index == 0x0)
 				print("new header\n");
 			else
-				print("indexed header, stored in index %d\n", index);
+				print("indexed header, stored in index %d: %s\n", index,
+																  hpackstatictable[index - 1].name);
 			if(framebuf[pos + 1] & 0x80)
 				print("huffman encoded\n");
 			len = framebuf[pos + 1] & 0x7f;
