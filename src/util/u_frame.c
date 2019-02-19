@@ -50,7 +50,7 @@ u_hdrframeresp(u8int* framebuf, u64int framelen, uint fd)
 		else if(framebuf[pos] & 0x40)
 		{
 			print("literal header field with inc indexing\n");
-			/* TODO: isnt this huffman encoded too? */
+			/* no. */
 			index = 0x3f & framebuf[pos];
 			if(index == 0x0)
 				print("new header\n");

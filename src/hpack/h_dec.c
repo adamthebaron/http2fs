@@ -12,16 +12,16 @@ h_decint(u8int *rep, u64int len, u64int *num, u8int bpref) {
 
 	m = 0;
 	max = pow(2, bpref) - 1;
-	print("found max: %d\n", max);
-	print("len is %d, num is %d\ngot rep: ", len, *num);
-	for(u64int i = 0; i < len; i++)
-		print("%x ", rep[i]);
-	print("\n");
-	print("and bit prefix %d\n", bpref);
+	//print("found max: %d\n", max);
+	//print("len is %d, num is %d\ngot rep: ", len, *num);
+	//for(u64int i = 0; i < len; i++)
+	//	print("%x ", rep[i]);
+	//print("\n");
+	//print("and bit prefix %d\n", bpref);
 	if(*rep < max)
 	{
 		*num = (u64int) *rep;
-		print("rep < max num is: %d\n", num);
+		//print("rep < max num is: %d\n", num);
 		return;
 	}
 	else
