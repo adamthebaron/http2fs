@@ -2,6 +2,9 @@
 #include "u_util.h"
 #include "../hpack/h_hpack.h"
 
+/*
+ * u_printframe
+ */
 void
 u_printframe(u8int* framebuf, u64int framelen)
 {
@@ -26,6 +29,7 @@ u_hdrframeresp(u8int* framebuf, u64int framelen, uint fd)
 
 	pos = 9;
 	inum = 0;
+	huffmanlen = 0;
 	huffmanbuffer = calloc(1024, sizeof(u8int));
 	decodebuf = calloc(1024, sizeof(u8int));
 	u_printframe(framebuf, framelen);
@@ -48,18 +52,15 @@ u_hdrframeresp(u8int* framebuf, u64int framelen, uint fd)
 			print("literal header field with inc indexing\n");
 			/* TODO: isnt this huffman encoded too? */
 			index = 0x3f & framebuf[pos];
-			print("huffman decoding 0x%x\n", index);
-			h_decint(index, 1, &inum, 6);
-			print("got huffman decoded integer index: %d\n", inum);
 			if(index == 0x0)
 				print("new header\n");
 			else
-				print("indexed header\n");
+				print("indexed header, stored in index %d\n", index);
 			if(framebuf[pos + 1] & 0x80)
 				print("huffman encoded\n");
 			len = framebuf[pos + 1] & 0x7f;
-			h_decint(len, 1, &huffmanlen, 7);
-			print("size: %d index %d\n", len, index);
+			h_decint(&len, 1, &huffmanlen, 7);
+			print("size: %d index %d\n", huffmanlen, index);
 			/* bitwise AND this byte with the msb unset
 			 * that bit is used to know if the header is
 			 * huffman encoded or not */
