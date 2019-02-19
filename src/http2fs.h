@@ -13,7 +13,7 @@
 /* max size of http buffer in bytes (64kb) */
 #define MaxBuf			64 * 1024
 /* total number of headers allowed per req */
-#define MaxHeaders		64
+#define MaxHeaders		4096	
 /* total size in bytes of a single header */
 #define MaxHeaderSize	2048
 

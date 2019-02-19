@@ -25,16 +25,24 @@ u_shiftarr(u8int* arr, u64int arrlen, u8int shiftlen, u8int direction)
 	u8int tmpbits;
 
 	u_printarr(arr, arrlen, "u_shiftarr");
-	for(u64int i = 0; i < arrlen; i++)
-	{
-		arr[i] <<= shiftlen;
-		if(i + 1 < arrlen)
+	if(direction == u_shiftarr_left)
+		for(u64int i = 0; i < arrlen; i++)
 		{
-			tmpbits = arr[i + 1] & ((1 << shiftlen) - 1);
-			print("got first %d bits (0x%x)\n", shiftlen, (1 << shiftlen) - 1);
-			arr[i] |= tmpbits;
+			arr[i] <<= shiftlen;
+			if(i + 1 < arrlen)
+			{
+				tmpbits = arr[i + 1] & ((1 << shiftlen) - 1);
+				print("got first %d bits (0x%x)\n", shiftlen, (1 << shiftlen) - 1);
+				arr[i] |= tmpbits;
+			}
 		}
-	}
+	else if(direction == u_shiftarr_right)
+		for(u64int i = 0; i < arrlen; i++)
+		{
+			
+		}
+	else
+		threadexitsall("u_shiftarr (direction)");
 	u_printarr(arr, arrlen, "u_shiftarr");
 	return;
 }

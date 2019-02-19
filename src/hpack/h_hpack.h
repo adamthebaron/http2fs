@@ -1,3 +1,6 @@
+#ifndef _HPACK_H_
+#define _HPACK_H_
+
 typedef struct HuffmanSymbol HuffmanSymbol;
 struct HuffmanSymbol {
 	u64int data;
@@ -330,8 +333,8 @@ static HHeader hpackstatictable[] = {
 	{ ":www-authenticate", nil }				/* 61 */
 };
 
-HHeader *hpackdynamictable[1024];
-
+//HHeader *hpackdynamictable[1024];
+typedef HHeader hpackdyntable[MaxHeaders];
 typedef struct HNode HNode; 
 struct HNode {
 	u32int symbol;
@@ -352,3 +355,5 @@ void h_inittree(void);
 void h_addnode(u8int symbol, u32int code, u8int len);
 void h_freenode(HNode*);
 void h_printtree(HNode*);
+
+#endif // _HPACK_H_
