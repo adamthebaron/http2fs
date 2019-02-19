@@ -22,8 +22,10 @@ u_hdrframeresp(u8int* framebuf, u64int framelen, uint fd)
 	u8int len, index, pos;
 	u8int* huffmanbuffer;
 	u8int* decodebuf;
+	u64int inum, huffmanlen;
 
 	pos = 9;
+	inum = 0;
 	huffmanbuffer = calloc(1024, sizeof(u8int));
 	decodebuf = calloc(1024, sizeof(u8int));
 	u_printframe(framebuf, framelen);
@@ -44,14 +46,19 @@ u_hdrframeresp(u8int* framebuf, u64int framelen, uint fd)
 		else if(framebuf[pos] & 0x40)
 		{
 			print("literal header field with inc indexing\n");
+			/* TODO: isnt this huffman encoded too? */
 			index = 0x3f & framebuf[pos];
+			print("huffman decoding 0x%x\n", index);
+			h_decint(index, 1, &inum, 6);
+			print("got huffman decoded integer index: %d\n", inum);
 			if(index == 0x0)
 				print("new header\n");
 			else
 				print("indexed header\n");
 			if(framebuf[pos + 1] & 0x80)
 				print("huffman encoded\n");
-			len = framebuf[pos + 1] & 0x3f;
+			len = framebuf[pos + 1] & 0x7f;
+			h_decint(len, 1, &huffmanlen, 7);
 			print("size: %d index %d\n", len, index);
 			/* bitwise AND this byte with the msb unset
 			 * that bit is used to know if the header is
@@ -61,6 +68,7 @@ u_hdrframeresp(u8int* framebuf, u64int framelen, uint fd)
 			 * by one so as to not count msb in first byte
 			 * during binary tree traversal */
 			memcpy(huffmanbuffer, &(framebuf[pos + 1]), len);
+			u_shiftarr(huffmanbuffer, sizeof(huffmanbuffer), 1, u_shiftarr_left);
 			print("huffmanbuffer contains: ");
 			for(u64int i = 0; i < len; i++)
 				print("%x ", huffmanbuffer[i]);

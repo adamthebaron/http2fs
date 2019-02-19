@@ -344,7 +344,7 @@ HNode* rootnode;
 void h_strtohex(char*, char*, long);
 void h_hextostr(char*, char*);
 void h_encint(u8int*, u64int*, u64int, u8int);
-void h_decint(u8int*, u64int*, u64int*, u8int);
+void h_decint(u8int*, u64int, u64int*, u8int);
 HNode* h_gentree(void);
 void h_huffmanenc(u8int*, u8int*, u16int, u8int*);
 void h_huffmandec(u8int*, u8int*, u16int);

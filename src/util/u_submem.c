@@ -2,21 +2,40 @@
 #include "u_util.h"
 
 /*
+ * u_printarr
+ */
+void
+u_printarr(u8int* arr, u64int arrlen, char* name)
+{
+	print("printing %s: ", name);
+	for(u64int i = 0; i < arrlen; i++)
+		print("%x ", arr[i]);
+	print("\n");
+	return;
+}
+
+
+/*
  * u_shiftarr
  * direction: 0x01 == left, 0x00 == right
  */
 void
 u_shiftarr(u8int* arr, u64int arrlen, u8int shiftlen, u8int direction)
 {
-	u8int byte1, byte2;
+	u8int tmpbits;
 
-	byte1 = byte2 = 0;
-	byte1 = arr[0];
-	byte2 = arr[1] & shiftlen;
-	for(u64int i = 0; i < arrlen, i++)
+	u_printarr(arr, arrlen, "u_shiftarr");
+	for(u64int i = 0; i < arrlen; i++)
 	{
-
+		arr[i] <<= shiftlen;
+		if(i + 1 < arrlen)
+		{
+			tmpbits = arr[i + 1] | ((1 << shiftlen) - 1);
+			print("got first %d bits (0x%x)\n", shiftlen, (1 << shiftlen) - 1);
+			arr[i] |= tmpbits;
+		}
 	}
+	u_printarr(arr, arrlen, "u_shiftarr");
 	return;
 }
 
