@@ -64,12 +64,12 @@ u_hdrframeresp(u8int* framebuf, u64int framelen, uint fd)
 			/* bitwise AND this byte with the msb unset
 			 * that bit is used to know if the header is
 			 * huffman encoded or not */
-			framebuf[pos + 1] &= 0x7f;
+			//framebuf[pos + 1] &= 0x7f;
 			/* TODO: need to shift everything in huffmanbuffer
 			 * by one so as to not count msb in first byte
 			 * during binary tree traversal */
-			memcpy(huffmanbuffer, &(framebuf[pos + 1]), len);
-			u_shiftarr(huffmanbuffer, sizeof(huffmanbuffer), 1, u_shiftarr_left);
+			memcpy(huffmanbuffer, &(framebuf[pos + 2]), len);
+			//u_shiftarr(huffmanbuffer, sizeof(huffmanbuffer), 1, u_shiftarr_left);
 			print("huffmanbuffer contains: ");
 			for(u64int i = 0; i < sizeof(huffmanbuffer); i++)
 				print("%x ", huffmanbuffer[i]);

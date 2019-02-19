@@ -30,7 +30,7 @@ u_shiftarr(u8int* arr, u64int arrlen, u8int shiftlen, u8int direction)
 		arr[i] <<= shiftlen;
 		if(i + 1 < arrlen)
 		{
-			tmpbits = arr[i + 1] | ((1 << shiftlen) - 1);
+			tmpbits = arr[i + 1] & ((1 << shiftlen) - 1);
 			print("got first %d bits (0x%x)\n", shiftlen, (1 << shiftlen) - 1);
 			arr[i] |= tmpbits;
 		}
