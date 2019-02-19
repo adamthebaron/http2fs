@@ -7,7 +7,7 @@
 void
 u_printarr(u8int* arr, u64int arrlen, char* name)
 {
-	print("printing %s: ", name);
+	print("printing %s (len %d): ", name, arrlen);
 	for(u64int i = 0; i < arrlen; i++)
 		print("%x ", arr[i]);
 	print("\n");

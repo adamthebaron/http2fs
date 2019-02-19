@@ -71,7 +71,7 @@ u_hdrframeresp(u8int* framebuf, u64int framelen, uint fd)
 			memcpy(huffmanbuffer, &(framebuf[pos + 1]), len);
 			u_shiftarr(huffmanbuffer, sizeof(huffmanbuffer), 1, u_shiftarr_left);
 			print("huffmanbuffer contains: ");
-			for(u64int i = 0; i < len; i++)
+			for(u64int i = 0; i < sizeof(huffmanbuffer); i++)
 				print("%x ", huffmanbuffer[i]);
 			print("\ndecoding... ");
 			h_huffmandec(decodebuf, huffmanbuffer, len);
