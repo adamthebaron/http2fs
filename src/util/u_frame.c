@@ -62,13 +62,6 @@ u_hdrframeresp(u8int* framebuf, u64int framelen, uint fd)
 			if(framebuf[pos + 1] & 0x80)
 			{
 				print("huffman encoded\n");
-				/* bitwise AND this byte with the msb unset
-				 * that bit is used to know if the header is
-				 * huffman encoded or not */
-				//framebuf[pos + 1] &= 0x7f;
-				/* TODO: need to shift everything in huffmanbuffer
-				 * by one so as to not count msb in first byte
-				 * during binary tree traversal */
 				memcpy(huffmanbuffer, &(framebuf[pos + 2]), len);
 				//u_shiftarr(huffmanbuffer, sizeof(huffmanbuffer), 1, u_shiftarr_left);
 				print("huffmanbuffer contains: ");
@@ -77,9 +70,6 @@ u_hdrframeresp(u8int* framebuf, u64int framelen, uint fd)
 				print("\ndecoding... ");
 				h_huffmandec(decodebuf, huffmanbuffer, len);
 				print("decoded.\ngot: %s\n", decodebuf);
-				/* jump by len + 2
-				 * len: length of huffman string
-				 * 2: 2 byte header */
 			}
 			else
 			{
@@ -89,6 +79,9 @@ u_hdrframeresp(u8int* framebuf, u64int framelen, uint fd)
 			}
 			memset(huffmanbuffer, 0, sizeof(huffmanbuffer));
 			memset(decodebuf, 0, len);
+			/* jump by len + 2
+			 * len: length of huffman string
+			 * 2: 2 byte header */
 			pos += len + 2;
 		}
 		/* literal header field without indexing (6.2.2) */
