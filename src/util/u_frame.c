@@ -56,27 +56,40 @@ u_hdrframeresp(u8int* framebuf, u64int framelen, uint fd)
 			else
 				print("indexed header, stored in index %d: %s\n", index,
 																  hpackstatictable[index - 1].name);
-			if(framebuf[pos + 1] & 0x80)
-				print("huffman encoded\n");
 			len = framebuf[pos + 1] & 0x7f;
 			h_decint(&len, 1, &huffmanlen, 7);
 			print("size: %d index %d\n", huffmanlen, index);
-			/* bitwise AND this byte with the msb unset
-			 * that bit is used to know if the header is
-			 * huffman encoded or not */
-			//framebuf[pos + 1] &= 0x7f;
-			/* TODO: need to shift everything in huffmanbuffer
-			 * by one so as to not count msb in first byte
-			 * during binary tree traversal */
-			memcpy(huffmanbuffer, &(framebuf[pos + 2]), len);
-			//u_shiftarr(huffmanbuffer, sizeof(huffmanbuffer), 1, u_shiftarr_left);
-			print("huffmanbuffer contains: ");
-			for(u64int i = 0; i < sizeof(huffmanbuffer); i++)
-				print("%x ", huffmanbuffer[i]);
-			print("\ndecoding... ");
-			h_huffmandec(decodebuf, huffmanbuffer, len);
-			print("decoded.\ngot: %s\n", decodebuf);
-			pos += len + 1;
+			if(framebuf[pos + 1] & 0x80)
+			{
+				print("huffman encoded\n");
+				/* bitwise AND this byte with the msb unset
+				 * that bit is used to know if the header is
+				 * huffman encoded or not */
+				//framebuf[pos + 1] &= 0x7f;
+				/* TODO: need to shift everything in huffmanbuffer
+				 * by one so as to not count msb in first byte
+				 * during binary tree traversal */
+				memcpy(huffmanbuffer, &(framebuf[pos + 2]), len);
+				//u_shiftarr(huffmanbuffer, sizeof(huffmanbuffer), 1, u_shiftarr_left);
+				print("huffmanbuffer contains: ");
+				for(u64int i = 0; i < sizeof(huffmanbuffer); i++)
+					print("%x ", huffmanbuffer[i]);
+				print("\ndecoding... ");
+				h_huffmandec(decodebuf, huffmanbuffer, len);
+				print("decoded.\ngot: %s\n", decodebuf);
+				/* jump by len + 2
+				 * len: length of huffman string
+				 * 2: 2 byte header */
+			}
+			else
+			{
+				print("not huffman encoded\n");
+				memcpy(decodebuf, &(framebuf[pos + 2]), huffmanlen);
+				print("got %s\n", (char*) decodebuf);
+			}
+			memset(huffmanbuffer, 0, sizeof(huffmanbuffer));
+			memset(decodebuf, 0, len);
+			pos += len + 2;
 		}
 		/* literal header field without indexing (6.2.2) */
 		else if((framebuf[pos] & 0x00) == 0x00)
@@ -96,6 +109,7 @@ u_hdrframeresp(u8int* framebuf, u64int framelen, uint fd)
 			printf("size: %d\n", len);
 			pos += len + 1;
 		}
+		print("current position in buffer: %d (%x)\n", pos, framebuf[pos]);
 	}
 	free(huffmanbuffer);
 	free(decodebuf);
