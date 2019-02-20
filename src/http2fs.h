@@ -67,17 +67,6 @@ typedef struct HStream HStream;
 typedef struct HMsg HMsg;
 typedef struct HConn HConn;
 typedef struct HSettings HSettings;
-typedef void (*framefunc) (u8int* framebuf, u64int framelen, uint fd);
-
-/* thread data
- * acfd, anfd, lnfd: file descriptors for tcp connection
- * pid: proc id
- * adir[], ldir[]: tcp connection on filesystem */
-typedef struct TData TData;
-struct TData {
-	int acfd, anfd, lnfd, pid;
-	char adir[64], ldir[64];
-};
 
 /* HStatusCodes indexes */
 enum statuscodes {
@@ -228,6 +217,22 @@ struct HConn {
 	HStream *stream[256];
 	//NetConnInfo *conninfo;	/* network info about connection */
 };
+
+/* thread data
+ * acfd, anfd, lnfd: file descriptors for tcp connection
+ * pid: proc id
+ * adir[], ldir[]: tcp connection on filesystem
+ * hpackdyntable: dynamic header table
+ * conn: http2 connection */
+typedef struct TData TData;
+struct TData {
+	int acfd, anfd, lnfd, pid;
+	char adir[64], ldir[64];
+	HHeader *hpackdyntable[MaxHeaders];
+	HConn* conn;
+};
+
+typedef void (*framefunc) (TData* data, u8int* framebuf, u64int framelen, uint fd);
 
 /* SETTINGS frame */
 struct HSettings {

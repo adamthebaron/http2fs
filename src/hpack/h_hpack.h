@@ -333,8 +333,6 @@ static HHeader hpackstatictable[] = {
 	{ ":www-authenticate", nil }				/* 61 */
 };
 
-//HHeader *hpackdynamictable[1024];
-typedef HHeader hpackdyntable[MaxHeaders];
 typedef struct HNode HNode; 
 struct HNode {
 	u32int symbol;

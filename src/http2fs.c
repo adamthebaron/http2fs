@@ -35,9 +35,9 @@ initresp(HMsg *resp)
 void
 initstream(HStream *s)
 {
-	s->req = (HMsg*) malloc(sizeof(HMsg));
-	s->resp = (HMsg*) malloc(sizeof(HMsg));
-	s->parent = (HStream*) malloc(sizeof(HStream));
+	s->req = malloc(sizeof(HMsg));
+	s->resp = malloc(sizeof(HMsg));
+	s->parent = malloc(sizeof(HStream));
 	initreq(s->req);
 	initresp(s->resp);
 	return;
@@ -48,10 +48,12 @@ initconn(HConn *conn, u32int id, u32int pid)
 {
 	if(pid==0)
 	{
-		conn->stream[0] = (HStream*) malloc(sizeof(HStream));
+		conn->stream[0] = malloc(sizeof(HStream));
 		initstream(conn->stream[0]);
 		conn->stream[0]->id = id;
 		conn->stream[0]->parent = nil;
+		conn->resp = malloc(sizeof(HMsg));
+		conn->req = malloc(sizeof(HMsg));
 	}
 	else 
 	{
@@ -59,6 +61,23 @@ initconn(HConn *conn, u32int id, u32int pid)
 		initstream(conn->stream[id]);
 		conn->stream[id]->parent = conn->stream[pid];
 	}
+	return;
+}
+
+void
+freestream(HStream* s)
+{
+	free(s->req);
+	free(s->resp);
+	free(s->parent);
+}
+
+void
+freeconn(HConn* conn)
+{
+	free(conn->req);
+	free(conn->resp);
+	freestream(conn->stream[0]);
 	return;
 }
 

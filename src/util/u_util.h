@@ -7,8 +7,8 @@
 void u_printarr(u8int*, u64int, char*);
 void u_shiftarr(u8int*, u64int, u8int, u8int);
 void u_prefixarr(u8int*, int, int*);
-void u_parsereq(HConn*, TData*);
-void u_hdrframeresp(u8int*, u64int, uint);
-void u_stgsframeresp(u8int*, u64int, uint);
+void u_parsereq(TData*);
+void u_hdrframeresp(TData*, u8int*, u64int, uint);
+void u_stgsframeresp(TData*, u8int*, u64int, uint);
 
 #endif // _UTIL_H_

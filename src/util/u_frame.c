@@ -20,7 +20,7 @@ u_printframe(u8int* framebuf, u64int framelen)
  * u_hdrframeresp
  */
 void
-u_hdrframeresp(u8int* framebuf, u64int framelen, uint fd)
+u_hdrframeresp(TData* data, u8int* framebuf, u64int framelen, uint fd)
 {
 	u8int len, index, pos;
 	u8int* huffmanbuffer;
@@ -77,6 +77,11 @@ u_hdrframeresp(u8int* framebuf, u64int framelen, uint fd)
 				memcpy(decodebuf, &(framebuf[pos + 2]), huffmanlen);
 				print("got %s\n", (char*) decodebuf);
 			}
+			strcpy(data->hpackdyntable[index - 1]->name, hpackstatictable[index - 1].name);
+			strcpy(data->hpackdyntable[index - 1]->val, decodebuf);
+			print("copied header in index: %d %s:%s\n", index - 1,
+														data->hpackdyntable[index - 1]->name,
+														data->hpackdyntable[index - 1]->val);
 			memset(huffmanbuffer, 0, sizeof(huffmanbuffer));
 			memset(decodebuf, 0, len);
 			/* jump by len + 2
@@ -114,7 +119,7 @@ u_hdrframeresp(u8int* framebuf, u64int framelen, uint fd)
  * u_stgsframeresp
  */
 void
-u_stgsframeresp(u8int* framebuf, u64int framelen, uint fd)
+u_stgsframeresp(TData* data, u8int* framebuf, u64int framelen, uint fd)
 {
 	u8int ack;
 
