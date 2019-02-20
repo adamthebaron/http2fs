@@ -20,12 +20,12 @@ u_parsereq(TData* data)
 	while(curpos < data->conn->rreq.len)
 	{
 		print("curpos: %d of %d bytes pos (len and type should be: %x %x %x %x)\n",
-															   curpos, conn->rreq.len,
+															   curpos, data->conn->rreq.len,
 															   data->conn->rreq.buf[curpos],
 															   data->conn->rreq.buf[curpos + 1],
 															   data->conn->rreq.buf[curpos + 2],
 															   data->conn->rreq.buf[curpos + 3]);
-		if(memcmp(&(conn->rreq.buf[curpos]), Http2ConnPrefix, sizeof(Http2ConnPrefix)) == 0x0)
+		if(memcmp(&(data->conn->rreq.buf[curpos]), Http2ConnPrefix, sizeof(Http2ConnPrefix)) == 0x0)
 		{
 			curpos += sizeof(Http2ConnPrefix);
 			print("found connection prefix\n");

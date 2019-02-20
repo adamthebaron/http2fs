@@ -24,7 +24,7 @@ t_responseproc(void* arg)
 	while((n = read(data->acfd, data->conn->rreq.buf, MaxBuf)) > 0)
 	{
 		print("read data... ");
-		data->conn.rreq.len = n;
+		data->conn->rreq.len = n;
 		print("got %d bytes\n", data->conn->rreq.len);
 		print("raw data: %x\n", data->conn->rreq.buf);
 		u_parsereq(data);
