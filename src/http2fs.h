@@ -159,7 +159,8 @@ static char* HStatuscodes[] = {
 };
 
 /* frame definitions */
-enum frames {
+enum frames
+{
 	/* 0000 */ Data =			0x0,
 	/* 0001 */ Headers =		0x1,
 	/* 0010 */ Priority =		0x2,
@@ -171,8 +172,28 @@ enum frames {
 	/* 1010 */ WindowUpdate =	0x8
 };
 
+enum errors
+{
+	NoError = 0x0,
+	ProtocolError = 0x1,
+	InternalError = 0x2,
+	FlowControlError = 0x3,
+	SettingsTimeout = 0x4,
+	StreamClosed = 0x5,
+	FrameSizeError = 0x6,
+	RefusedStream = 0x7,
+	Cancel = 0x8,
+	CompressionError = 0x9,
+	ConnectError = 0xa,
+	/* lol */
+	EnhanceYourCalm = 0xb,
+	InadequateSecurity = 0xc,
+	Http1Required = 0xd
+};
+
 /* SETTINGS frame parameters */
-enum http2settings {
+enum http2settings
+{
 	/* 0001 */ HeaderTableSize =		0x1,
 	/* 0010 */ EnablePush =				0x2,
 	/* 0011 */ MaxConcurrentStreams =	0x3,
@@ -182,27 +203,31 @@ enum http2settings {
 };
 
 /* method data structure */
-struct HMethod {
+struct HMethod
+{
 	char method[8];	/* "verb" of method */
 	char url[256];		/* location of document requested */
 	char version[8];	/* http version */
 };
 
 /* header data structure */
-struct HHeader {
+struct HHeader
+{
 	char name[64]; /* name of header (Content-Type, Upgrade, etc) */
 	char val[256]; /* value of respective header */
 };
 
 /* http message data structure */
-struct HMsg {
+struct HMsg
+{
 	u64int len;
 	u64int curpos;
 	u8int buf[MaxBuf];
 };
 
 /* http/2 stream structure */
-struct HStream {
+struct HStream
+{
 	u64int id;
 	HMsg *resp;
 	HMsg *req;
@@ -211,7 +236,8 @@ struct HStream {
 };
 
 /* connection state */
-struct HConn {
+struct HConn
+{
 	HMsg rreq;
 	HMsg rresp;
 	HStream *stream[256];
@@ -225,7 +251,8 @@ struct HConn {
  * hpackdyntable: dynamic header table
  * conn: http2 connection */
 typedef struct TData TData;
-struct TData {
+struct TData
+{
 	int acfd, anfd, lnfd, pid;
 	char adir[64], ldir[64];
 	HHeader *hpackdyntable[MaxHeaders];
@@ -235,7 +262,8 @@ struct TData {
 typedef void (*framefunc) (TData* data, u8int* framebuf, u64int framelen, uint fd);
 
 /* SETTINGS frame */
-struct HSettings {
+struct HSettings
+{
 	u16int id[6];
 	u32int val[6];
 };
